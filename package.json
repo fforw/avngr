@@ -1,0 +1,47 @@
+{
+  "name": "wp-react",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack -p",
+    "build-dev": "webpack -d -w",
+    "test": "mocha --compilers js:babel-register -R spec test/"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "domready": "^1.0.8",
+    "extend": "^3.0.0",
+    "react": "^15.0.1",
+    "react-dom": "^15.0.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.7.6",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-check-es2015-constants": "^6.7.2",
+    "babel-plugin-espower": "^2.1.2",
+    "babel-plugin-react-transform": "^2.0.2",
+    "babel-plugin-transform-es2015-arrow-functions": "^6.5.2",
+    "babel-plugin-transform-es2015-block-scoping": "^6.7.1",
+    "babel-plugin-transform-es2015-computed-properties": "^6.6.5",
+    "babel-plugin-transform-es2015-destructuring": "^6.6.5",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.7.4",
+    "babel-plugin-transform-node-env-inline": "^6.5.0",
+    "babel-plugin-transform-object-rest-spread": "^6.6.5",
+    "babel-plugin-transform-react-display-name": "^6.5.0",
+    "babel-plugin-transform-react-jsx": "^6.7.5",
+    "babel-plugin-transform-strict-mode": "^6.6.5",
+    "babel-register": "^6.7.2",
+    "expect": "^1.13.4",
+    "expect-jsx": "^2.2.2",
+    "jsdom": "^7.2.2",
+    "mocha": "^2.4.5",
+    "node-notifier": "^4.3.1",
+    "power-assert": "^1.2.0",
+    "proxyquire": "^1.7.3",
+    "react-transform-catch-errors": "^1.0.1",
+    "sinon": "^1.17.2",
+    "webpack": "^1.13.0"
+  }
+}
