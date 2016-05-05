@@ -4,14 +4,7 @@
     <entry_points version="2.0" />
   </component>
   <component name="JavaScriptSettings">
-    <option name="languageLevel" value="JSX" />
-  </component>
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="mavenHome" value="Bundled (Maven 3)" />
-      </MavenGeneralSettings>
-    </option>
+    <option name="languageLevel" value="ES6" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />

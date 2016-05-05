@@ -10,6 +10,10 @@ module.exports = {
                 test: /.jsx?$/,
                 loader: 'babel-loader',
                 exclude: /node_modules/
+            },
+            {
+                test: /.svg$/,
+                loader: path.join(__dirname,  './tooling/level-loader')
             }
         ]
     }
