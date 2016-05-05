@@ -168,7 +168,8 @@ Player.prototype.update = function (now)
                 y: this.y + 8,
                 dx: this.dx,
                 dy: 0,
-                aabb: new AABB(this.x - 7, this.y - 7 + 8, this.x + 7, this.y + 7 + 8)
+                aabb: new AABB(this.x - 7, this.y - 7 + 8, this.x + 7, this.y + 7 + 8),
+                start: now
             };
             console.log("BOMB FIRED", this.bombs[i]);
             bombFired = false;
@@ -231,7 +232,7 @@ Player.prototype.collide = function (now, level)
     for (i = 0; i < this.bombs.length; i++)
     {
         var bomb = this.bombs[i];
-        if (bomb && level.collide(bomb.x + 7, bomb.y + 7))
+        if (bomb && (now - bomb.start > 3000 || level.collide(bomb.x + 7, bomb.y + 7)))
         {
             if (!bomb.explosion)
             {
