@@ -232,12 +232,9 @@ Player.prototype.collide = function (now, level)
     for (i = 0; i < this.bombs.length; i++)
     {
         var bomb = this.bombs[i];
-        if (bomb && (now - bomb.start > 3000 || level.collide(bomb.x + 7, bomb.y + 7)))
+        if (bomb && !bomb.explosion && (now - bomb.start > 3000 || level.collide(bomb.x + 7, bomb.y + 7)))
         {
-            if (!bomb.explosion)
-            {
-                bomb.explosion = Explosion.create(now, bomb.x + 7, bomb.y + 7, 7, 7, 1);
-            }
+            bomb.explosion = Explosion.create(now, bomb.x + 7, bomb.y + 7, 7, 7, 1);
         }
     }
 
