@@ -11,10 +11,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "browser-audio": "^1.0.2",
     "domready": "^1.0.8",
     "extend": "^3.0.0",
     "object.assign": "^4.0.3",
-    "raf": "^3.2.0"
+    "raf": "^3.2.0",
+    "xorshift": "^0.2.0"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",
