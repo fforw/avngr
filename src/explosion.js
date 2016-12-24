@@ -1,71 +1,62 @@
+const Sounds = require("./sounds");
 
-var EXPLOSION_TIME = 600;
-var EXPLOSION_MIN_SIZE = 4;
-var EXPLOSION_MAX_SIZE = 16;
+var Entities;
+var EntityType;
+
+function initEntities()
+{
+    if (!Entities)
+    {
+        Entities = require("./entities");
+        EntityType = Entities.EntityType
+    }
+}
+const {_TYPE, _X, _Y, _DX, _DY, _DATA, _OWNER, _SIZE_OF, _START} = require("./entities/constants");
 
 const TAU = Math.PI * 2;
-const EXPLOSION_RANGE = EXPLOSION_MAX_SIZE - EXPLOSION_MIN_SIZE;
 
-module.exports = {
+var Explosion = {
     create: function(now, x, y, w, h, size)
     {
+        initEntities();
 
-        var vertices = new Array(size * 3);
-        for (var i=0; i < vertices.length ; i+= 3)
+        for (var i=0; i < size ; i++)
         {
             var ringSize = size == 1 ? 1 : Math.random();
             var a = Math.random() * TAU;
             var d = w / ( 3 + (1 - ringSize));
-            vertices[i    ] = x + Math.cos(a) * d;
-            vertices[i + 1] = y + Math.sin(a) * d;
-            vertices[i + 2] = ringSize;
-        }
 
-        return {
-            start: now,
-            vertices: vertices
-        };
+            let id = Entities.newId();
+
+            Explosion.init(
+                id,
+                x + Math.cos(a) * d,
+                y + Math.sin(a) * d,
+                ringSize
+            );
+        }
     },
-    render: function (ctx, explosion, now)
+    init: function(id, x, y, ringSize)
     {
-        if (!explosion)
+        initEntities();
+
+        var array = Entities.getArray();
+
+        var ownerId = array[id + _OWNER];
+        if (ownerId > 0)
         {
-            return false;
+            Entities.callback(Date.now(), ownerId, id, -1);
+            array[id + _OWNER] = -1;
         }
 
-        var size, delta = now - explosion.start;
-        if (delta < EXPLOSION_TIME * 2)
-        {
-            if (delta < EXPLOSION_TIME)
-            {
-                size = delta / EXPLOSION_TIME;
-                size = size * size;
-            }
-            else
-            {
+        array[id + _TYPE] = EntityType.EXPLOSION;
+        array[id + _X] = x;
+        array[id + _Y] = y;
+        array[id + _START] = 0;
+        array[id + _DATA] = ringSize;
 
-                size = 1 - (delta - EXPLOSION_TIME)/ EXPLOSION_TIME;
-            }
+        Sounds.play(Sounds.EXPLOSION);
 
-            ctx.fillStyle = "rgba(255, 204, 0, 0.66)";
-            ctx.strokeStyle = "rgba(255,32,0, 0.5)";
-
-
-            var vertices = explosion.vertices;
-            //console.log("RENDER", vertices, size);
-
-            for (var i = 0; i < vertices.length; i+= 3)
-            {
-                ctx.beginPath();
-                ctx.arc(vertices[i], vertices[i + 1], EXPLOSION_MIN_SIZE + size * vertices[i + 2] * (EXPLOSION_RANGE), 0, TAU);
-                ctx.fill();
-                ctx.stroke();
-            }
-
-            return false;
-        }
-
-        console.log("explosion end");
-        return true;
     }
 };
+module.exports = Explosion;

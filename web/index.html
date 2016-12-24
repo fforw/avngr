@@ -18,27 +18,52 @@
         left: -10000px;
     }
 
-    .gh,.gh:visited
+    .toolbar
     {
         position: absolute;
         top: 0;
         right: 0;
+        margin: 4px 1ex;
+    }
+
+    .toolbar a,.toolbar a:visited
+    {
         color: #fff;
+    }
+    .bright .toolbar a,.bright .toolbar a:visited
+    {
+        color: #000;
     }
 </style>
 
 
-<script type="text/javascript" src="bundle.js">
+<script type="text/javascript" src="code/main.js">
 </script>
 
 </head>
 <body>
 <canvas id="screen">
 </canvas>
-<a class="gh" href="https://github.com/fforw/avngr">Github</a>
+<div class="toolbar">
+    <a title="Show game controls" href="controls.html">Controls</a>
+    <a title="Visit AVNGR github project page" href="https://github.com/fforw/avngr">Github</a>
+</div>
 <img id="shield" class="off" src="image/shield.png"/>
 <img id="ship"  class="off" src="image/ship.png"/>
 <img id="bomb" class="off" src="image/bomb.png"/>
 <img id="coin" class="off" src="image/coin.png"/>
+<img id="rocket" class="off" src="image/rocket.png"/>
+<img id="sentinel" class="off" src="image/sentinel.png"/>
+<img id="score100" class="off" src="image/100.png"/>
+<img id="score200" class="off" src="image/200.png"/>
+<img id="score500" class="off" src="image/500.png"/>
+<img id="score1000" class="off" src="image/1000.png"/>
+<img id="bg" class="off" src="image/bg.jpg"/>
+<img id="logo" class="off" src="image/logo.png"/>
+<img id="collateral" class="off" src="image/collateral.png"/>
+<img id="collateral2" class="off" src="image/collateral2.png"/>
+<img id="collateral3" class="off" src="image/collateral3.png"/>
+<img id="health" class="off" src="image/health.png"/>
+<img id="patrol" class="off" src="image/patrol.png"/>
 </body>
 </html>

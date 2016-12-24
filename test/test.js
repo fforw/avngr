@@ -5,6 +5,16 @@ describe("Testing", function(){
 	{
 		assert(true);
 	});
+	it("extr", function()
+	{
+        var { foo, bar } = {
+            foo: 1,
+            bar: 2
+        };
+
+		assert(foo === 1);
+		assert(bar === 2);
+	});
 	it("Power Assert works", function()
 	{
         var foo = "abc";

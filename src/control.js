@@ -62,6 +62,7 @@ var Control = {
                 {
                     keyState[keys[i]] = null;
                 }
+                //console.log("ACTIVE:", ctrl )
                 return true;
             }
         }
@@ -80,6 +81,7 @@ var Control = {
         {
             keyState[keyCode] = true;
         }
+        return false;
     },
     onKeyUp: function (ev)
     {
@@ -91,6 +93,7 @@ var Control = {
         }
         ev.preventDefault();
         keyState[keyCode] = false;
+        return false;
     }
 };
 module.exports = Control;

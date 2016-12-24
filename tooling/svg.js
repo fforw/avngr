@@ -1,7 +1,7 @@
 
 var jsdom = require("jsdom");
 var svgPath = require("svgpath");
-var rgba = require("./rgba");
+var Colors = require("../src/colors");
 
 var blacklist = {
     "fill-rule": true,
@@ -116,12 +116,12 @@ var SVGUtil = {
 
                 if (fillColor && fillColor !== "none" && fillColor !== "transparent" && opacity !== 0)
                 {
-                    styles.fillStyle = rgba(fillColor, opacity);
+                    styles.fillStyle = Colors.rgba(fillColor, opacity);
                 }
 
                 if (strokeColor && strokeOpacity !== 0)
                 {
-                    styles.strokeStyle = rgba(strokeColor, strokeOpacity);
+                    styles.strokeStyle = Colors.rgba(strokeColor, strokeOpacity);
                     if (strokeWidth)
                     {
                         styles.lineWidth = strokeWidth;
@@ -143,8 +143,7 @@ var SVGUtil = {
             var transform = elem.getAttribute("transform");
             if (transform)
             {
-                //console.log("transform", transform);
-                path = path.transform(transform);
+                path = svgPath(path.transform(transform).toString());
             }
             elem = elem.parentNode;
         }

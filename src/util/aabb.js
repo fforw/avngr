@@ -86,4 +86,17 @@ AABB.prototype.center = function ()
     }
 };
 
+AABB.prototype.merge = function (aabb)
+{
+    this.x0 = Math.min(this.x0, aabb.x0);
+    this.y0 = Math.min(this.y0, aabb.y0);
+    this.x1 = Math.max(this.x1, aabb.x1);
+    this.y1 = Math.max(this.y1, aabb.y1);
+};
+
+AABB.prototype.toString = function (aabb)
+{
+    return "[AABB:" + this.x0 + ", " + this.y0 + " -> " + this.x1 + ", " + this.y1 + "]";
+};
+
 module.exports = AABB;

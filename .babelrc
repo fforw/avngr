@@ -2,7 +2,6 @@
 
     "presets": ["es2015"],
     "plugins": [
-        "transform-es2015-block-scoping",
         "babel-plugin-espower"
     ]
 }

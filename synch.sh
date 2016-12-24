@@ -1,3 +1,3 @@
 #!/bin/bash
-
-rsync -rvIz --rsh=ssh --delete --exclude=.git ./web/ newweb:/var/www/static/demo/avngr
+npm run build
+rsync -rvIz --rsh=ssh --delete --exclude=.git --exclude=*.blend ./web/ newweb:/var/www/static/demo/avngr
