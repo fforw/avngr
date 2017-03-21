@@ -1,0 +1,66 @@
+{
+    "root": {
+        "name": "Selector",
+        "kids": [
+            {
+                "name": "Sequence",
+                "kids": [
+                    {
+                        "name": "is-relaxed"
+                    },
+                    {
+                        "name": "patrol"
+                    }
+                ]
+            },
+            {
+                "name": "Selector",
+                "kids": [
+                    {
+                        "name": "Sequence",
+                        "kids": [
+                            {
+                                "name": "is-player-visible"
+                            },
+                            {
+                                "name": "Selector",
+                                "kids": [
+                                    {
+                                        "name": "Sequence",
+                                        "kids": [
+                                            {
+                                                "name": "is-player-dead"
+                                            },
+                                            {
+                                                "name": "set-relaxed",
+                                                "value": "true"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Sequence",
+                                        "kids": [
+                                            {
+                                                "name": "set-relaxed",
+                                                "value": "false"
+                                            },
+                                            {
+                                                "name": "remember-player-position"
+                                            },
+                                            {
+                                                "name": "attack"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "follow-player"
+                    }
+                ]
+            }
+        ]
+    }
+}

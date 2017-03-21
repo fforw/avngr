@@ -1,10 +1,12 @@
-var assign = require("object.assign").getPolyfill();
+const assign = require("object.assign").getPolyfill();
 
 const Images = require("../images");
 
 const AABB = require("../util/aabb");
 const Score = require("../score");
-const AIStates = require("./ai-states");
+
+const BehaviorInstances = require("./behavior-instances");
+const patrolBehavior = require("./patrol-behavior");
 
 const MAX_ENTITIES = 1000;
 
@@ -12,47 +14,48 @@ const EntityType = require("./type");
 const {_TYPE, _X, _Y, _DX, _DY, _DATA, _SIZE_OF, _OWNER, _START} = require("./constants");
 
 const ARRAY_LEN = MAX_ENTITIES * _SIZE_OF;
-var array = new Float64Array(ARRAY_LEN);
+
+const array = new Float64Array(ARRAY_LEN);
 
 // Current end index of the allocated buffer
-var allocationEnd;
+let allocationEnd;
 
 // number of currently removed entities
-var removedEntities;
+let removedEntities;
 
 // starting point for the next id reclamation
-var reclaimStart;
+let reclaimStart;
 
-var nameToNumericType = {
-    "bonus" : EntityType.BONUS,
-    "rocket" : EntityType.ROCKET,
-    "collateral" : EntityType.COLLATERAL,
-    "health" : EntityType.HEALTH,
-    "end" : EntityType.END,
-    "sentinel" : EntityType.SENTINEL,
-    "patrol" : EntityType.PATROL_ROUTE
+const nameToNumericType = {
+    "bonus": EntityType.BONUS,
+    "rocket": EntityType.ROCKET,
+    "collateral": EntityType.COLLATERAL,
+    "health": EntityType.HEALTH,
+    "end": EntityType.END,
+    "sentinel": EntityType.SENTINEL,
+    "patrol": EntityType.PATROL_ROUTE
 };
 
-var defaultOpts = {
+const defaultOpts = {
     playerCollision: false,
     canShoot: false,
     canBomb: false,
     scoreValue: 100
 };
 
-var entityHandlers = {
-    "bonus" : require("./bonus"),
-    "rocket" : require("./rocket"),
-    "collateral" : require("./collateral"),
-    "health" : require("./health"),
-    "end" : require("./end"),
-    "sentinel" : require("./sentinel")
+const entityHandlers = {
+    "bonus": require("./bonus"),
+    "rocket": require("./rocket"),
+    "collateral": require("./collateral"),
+    "health": require("./health"),
+    "end": require("./end"),
+    "sentinel": require("./sentinel")
 };
 
-var handlersByType = (function ()
+const handlersByType = (function ()
 {
-    var handlers = {};
-    for (var name in entityHandlers)
+    const handlers = {};
+    for (let name in entityHandlers)
     {
         if (entityHandlers.hasOwnProperty(name))
         {
@@ -79,11 +82,11 @@ handlersByType[EntityType.LASER] = require("./laser");
 handlersByType[EntityType.SENSOR] = require("./sensor");
 handlersByType[EntityType.PATROL] = require("./patrol");
 
-var images;
+let images;
 
-var offsets = [];
+const offsets = [];
 
-var game;
+let game;
 
 
 function ensureValid(id)
@@ -99,7 +102,7 @@ function ensureValid(id)
     }
 }
 
-var Entities = {
+const Entities = {
     createEntities: function (entitiesData)
     {
         if (!images)
@@ -128,57 +131,61 @@ var Entities = {
 
             for (let i = 0; i < images.length; i++)
             {
-                var image = images[i];
+                const image = images[i];
                 if (image)
                 {
-                    offsets[i] = { x: -(image.width/2)|0, y: -(image.height/2)|0};
+                    offsets[i] = {
+                        x: -(image.width / 2) | 0,
+                        y: -(image.height / 2) | 0
+                    };
                 }
             }
 
         }
 
-        var now = Date.now();
+        const now = Date.now();
 
-        for (var typeName in entitiesData)
+        for (let typeName in entitiesData)
         {
             if (entitiesData.hasOwnProperty(typeName))
             {
-                var objs = entitiesData[typeName];
+                const objs = entitiesData[typeName];
 
                 for (let i = 0; i < objs.length; i++)
                 {
-                    var objData = objs[i];
-                    var type = nameToNumericType[typeName];
+                    const objData = objs[i];
+                    const type = nameToNumericType[typeName];
 
                     if (type === EntityType.END)
                     {
-                        var endAABB = AABB.fromArray(objData.vertices);
-                        var endId = Entities.create(type, endAABB.x0, endAABB.y0, now);
+                        const endAABB = AABB.fromArray(objData.vertices);
+                        const endId = Entities.create(type, endAABB.x0, endAABB.y0, now);
                         array[endId + _DX] = endAABB.x1;
                         array[endId + _DY] = endAABB.y1;
                         console.log("Init end AABB = ", endAABB);
                     }
                     else if (type === EntityType.PATROL_ROUTE)
                     {
-                        var vertices = objData.vertices;
-                        var off = (vertices.length/2) & ~1;
-                        var patrolId = Entities.create(EntityType.PATROL, vertices[0], vertices[1], now);
-                        console.log("POS", array[patrolId + _X], array[patrolId + _Y]);
-                        var aiState = AIStates.aiStateById[patrolId];
-                        aiState.vertices = vertices;
-                        aiState.index = 0;
+                        const vertices = objData.vertices;
+                        const off = (vertices.length / 2) & ~1;
 
-                        patrolId = Entities.create(EntityType.PATROL, vertices[off], vertices[off + 1], now);
+                        const patrolId = Entities.create(EntityType.PATROL, vertices[0], vertices[1], now);
+                        BehaviorInstances.behaviorsById[patrolId] = patrolBehavior.createInstance({
+                            relaxed: true,
+                            vertices: vertices,
+                            index: 0
+                        });
 
-                        console.log("POS", array[patrolId + _X], array[patrolId + _Y]);
-
-                        aiState = AIStates.aiStateById[patrolId];
-                        aiState.vertices = vertices;
-                        aiState.index = off/2;
+                        const patrol2Id = Entities.create(EntityType.PATROL, vertices[off], vertices[off + 1], now);
+                        BehaviorInstances.behaviorsById[patrol2Id] = patrolBehavior.createInstance({
+                            relaxed: true,
+                            vertices: vertices,
+                            index: off / 2
+                        });
                     }
                     else
                     {
-                        var entityId = Entities.create(type, objData.x, objData.y, now);
+                        let entityId = Entities.create(type, objData.x, objData.y, now);
 
                         // make sure sentinels and collaterals are generously marked as off-limits for AI
 
@@ -212,13 +219,13 @@ var Entities = {
                 throw new Error("Max entries reached");
             }
 
-            var newId = allocationEnd;
+            const newId = allocationEnd;
             allocationEnd += _SIZE_OF;
             return newId;
         }
         else
         {
-            for (var i = reclaimStart; i >= 0; i -= _SIZE_OF)
+            for (let i = reclaimStart; i >= 0; i -= _SIZE_OF)
             {
                 if (!array[i + _TYPE])
                 {
@@ -241,7 +248,7 @@ var Entities = {
             throw new Error("Entity already removed");
         }
 
-        var ownerId = array[id + _OWNER];
+        const ownerId = array[id + _OWNER];
         if (ownerId >= 0)
         {
             Entities.callback(Date.now(), ownerId, id, relatedId)
@@ -265,7 +272,7 @@ var Entities = {
      */
     create: function (type, x, y, start)
     {
-        var id = Entities.newId();
+        const id = Entities.newId();
 
         array[id + _TYPE] = type;
         array[id + _X] = x;
@@ -276,7 +283,7 @@ var Entities = {
         array[id + _OWNER] = -1;
         array[id + _START] = start || Date.now();
 
-        var typeHandler = handlersByType[type];
+        let typeHandler = handlersByType[type];
 
         if (!typeHandler)
         {
@@ -314,37 +321,37 @@ var Entities = {
         ctx.save();
         ctx.translate(-viewAABB.x0, -viewAABB.y0);
 
-        for (var i = 0; i < allocationEnd; i += _SIZE_OF)
+        for (let i = 0; i < allocationEnd; i += _SIZE_OF)
         {
-            var type = array[i + _TYPE];
+            const type = array[i + _TYPE];
 
             if (type && type !== EntityType.PLAYER)
             {
-                var handler = handlersByType[type];
-                var image = images[type];
+                const handler = handlersByType[type];
+                const image = images[type];
                 if (handler.render)
                 {
                     handler.render(ctx, now, viewAABB, array, i, image)
                 }
                 else if (image)
                 {
-                    var x = array[i + _X];
-                    var y = array[i + _Y];
-                    var off = offsets[type];
+                    const x = array[i + _X];
+                    const y = array[i + _Y];
+                    const off = offsets[type];
                     ctx.drawImage(image, off.x + x, off.y + y);
                 }
             }
         }
         ctx.restore();
     },
-    callback: function(now, ownerId, id, targetId)
+    callback: function (now, ownerId, id, targetId)
     {
         ensureValid(ownerId);
 
-        var type = array[ownerId + _TYPE];
+        const type = array[ownerId + _TYPE];
         if (type !== EntityType.NONE)
         {
-            var handler = handlersByType[type];
+            const handler = handlersByType[type];
             if (handler.callback)
             {
                 handler.callback(now, array, ownerId, id, targetId, game)
@@ -353,12 +360,12 @@ var Entities = {
     },
     update: function (now, game)
     {
-        for (var i = 0; i < allocationEnd; i += _SIZE_OF)
+        for (let i = 0; i < allocationEnd; i += _SIZE_OF)
         {
-            var type = array[i + _TYPE];
+            const type = array[i + _TYPE];
             if (type !== EntityType.NONE)
             {
-                var handler = handlersByType[type];
+                const handler = handlersByType[type];
                 if (handler.update)
                 {
                     handler.update(now, array, i, game)
@@ -368,11 +375,11 @@ var Entities = {
     },
 
     // removes all entities
-    clear: function()
+    clear: function ()
     {
         allocationEnd = 0;
         removedEntities = 0;
-        AIStates.aiStateById = {};
+        BehaviorInstances.behaviorsById = {};
     },
 
     getArray: function ()
@@ -390,7 +397,7 @@ var Entities = {
         assign({}, defaultOpts, opts);
     },
 
-    init: function(_game)
+    init: function (_game)
     {
         game = _game;
     },

@@ -19,6 +19,11 @@ module.exports = {
                 exclude: /node_modules/
             },
             {
+                test: /.json$/,
+                loader: 'json-loader'
+            },
+            // Our custom loader for SVG based levels.
+            {
                 test: /.svg$/,
                 loader: path.join(__dirname,  './tooling/level-loader')
             }

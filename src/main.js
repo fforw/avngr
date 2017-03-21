@@ -3,6 +3,10 @@ var Control = require("./control");
 
 var Sounds = require("./sounds");
 
+const Behavior = require("ff-behavior");
+
+Behavior.registerFromRequireContext(require.context("./behavior/", true, /\.js$/));
+
 // Game resolution: Determines how much we scale up the canvas via CSS
 //const RESOLUTION = 2;
 
